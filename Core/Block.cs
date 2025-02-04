@@ -165,7 +165,6 @@ public class Block
         };
     }
 
-
     private void GetBlockUV(int offsetX, int offsetY, float atlasSize, float blockPixelSize, out float uMin, out float vMin, out float uMax, out float vMax)
     {
         float blockSize = blockPixelSize / atlasSize;

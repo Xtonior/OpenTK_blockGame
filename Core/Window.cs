@@ -10,7 +10,8 @@ namespace Engine
 {
     public class Window : GameWindow
     {
-        private Shader _lampShader;
+        private TerrainGenerator terrainGenerator;
+        private World world;
 
         private Shader _lightingShader;
 
@@ -19,9 +20,6 @@ namespace Engine
         private bool _firstMove = true;
 
         private Vector2 _lastPos;
-
-        private Vector3i chunkSize = new Vector3i(16, 128, 16);
-        private List<Block> chunk;
 
         public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings)
             : base(gameWindowSettings, nativeWindowSettings)
@@ -37,31 +35,11 @@ namespace Engine
             GL.Enable(EnableCap.DepthTest);
 
             _lightingShader = new Shader("Assets/Shaders/shader.vert", "Assets/Shaders/lighting.frag");
-            _lampShader = new Shader("Assets/Shaders/shader.vert", "Assets/Shaders/shader.frag");
+            
+            world = new World();
 
-            chunk = new List<Block>();
-
-            /*for (int x = 0; x < chunkSize.X; x++)
-            {
-                for (int y = 0; y < chunkSize.X; y++)
-                {
-                    for (int z = 0; z < chunkSize.X; z++)
-                    {
-                        chunk.Add(new Block(new Vector3(x, y, z), _lightingShader, "Assets/Textures/cube.png"));
-                    }
-                }
-            }*/
-
-            for (int x = 0; x < 4; x++)
-            {
-                for (int y = 0; y < 4; y++)
-                {
-                    for (int z = 0; z < 4; z++)
-                    {
-                        chunk.Add(new Block(new Vector3(x, y, z), _lightingShader, "Assets/Textures/atl_blocks.png"));
-                    }
-                }
-            }
+            terrainGenerator = new TerrainGenerator();
+            terrainGenerator.Generate(_lightingShader, world);
 
             _camera = new Camera(new Vector3(10, 0, 0), Size.X / (float)Size.Y);
 
@@ -74,15 +52,12 @@ namespace Engine
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            for (int i = 0; i < chunk.Count; i++)
-            {
-                RenderBlock(chunk[i]);
-            }
+            RenderWorld();
 
             SwapBuffers();
         }
 
-        protected void RenderBlock(Block block)
+        protected void RenderWorld()
         {
             _lightingShader.Use();
             _lightingShader.SetMatrix4("view", _camera.GetViewMatrix());
@@ -90,7 +65,7 @@ namespace Engine
             _lightingShader.SetVector3("objectColor", new Vector3(1.0f, 1.0f, 1.0f));
             _lightingShader.SetVector3("lightColor", new Vector3(1.0f, 1.0f, 1.0f));
 
-            block.Render(_lightingShader);
+            world.Render(_lightingShader);
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
