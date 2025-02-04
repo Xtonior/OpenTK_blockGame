@@ -4,8 +4,8 @@ using OpenTK.Mathematics;
 
 public class TerrainGenerator
 {
-    private int worldX = 1;
-    private int worldy = 1;
+    private int worldX = 5;
+    private int worldy = 5;
 
     private List<Chunk> chunks = new List<Chunk>();
 
